@@ -1,6 +1,11 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useWeather } from './hooks/useWeather'
+import { useFavorites } from './hooks/useFavorites'
+import Sidebar from './components/Sidebar'
 import WeatherIcon from './components/WeatherIcon'
+import HourlyForecastView from './components/HourlyForecast'
+import TemperatureChart from './components/TemperatureChart'
+import WeatherDetailView from './components/WeatherDetail'
 import { format } from 'date-fns'
 import { getBgClass, getRainIntensity, getSnowIntensity, getWeatherLabel, getWeatherType } from './utils/weatherCode'
 import './index.css'
@@ -42,14 +47,15 @@ const SNOW_FLAKES_HEAVY = createSnowFlakes(BASE_SNOW_COUNT * 2)
 
 function App() {
 	const { data, loading, error, fetchWeather, city } = useWeather()
+	const { favorites, addFavorite, removeFavorite, reorderFavorites, isFavorite } = useFavorites()
 	const inputRef = useRef<HTMLInputElement>(null)
 	const thunderRef = useRef<HTMLDivElement>(null)
+	const [sidebarOpen, setSidebarOpen] = useState(false)
 
+	// 同步输入框与当前城市
 	useEffect(() => {
-		if (city) {
-			if (inputRef.current) {
-				inputRef.current.value = city
-			}
+		if (city && inputRef.current) {
+			inputRef.current.value = city
 		}
 	}, [city])
 
@@ -64,6 +70,18 @@ function App() {
 		e.preventDefault()
 		const value = inputRef.current?.value.trim() ?? ''
 		fetchWeather(value)
+	}
+
+	/** 侧边栏切换城市 */
+	const handleSelectCity = (name: string) => {
+		fetchWeather(name)
+	}
+
+	/** 收藏当前城市 */
+	const handleAddFavorite = () => {
+		if (city && !isFavorite(city)) {
+			addFavorite(city)
+		}
 	}
 
 	const effectiveCode = data?.currentCode ?? 0
@@ -123,9 +141,24 @@ function App() {
 				aria-hidden='true'
 				ref={thunderRef}
 			/>
-				<div className='weather-card'>
-					<form onSubmit={handleSearch} className='search-form'>
-						<input
+
+			{/* 侧边栏：收藏城市管理 */}
+			<Sidebar
+				favorites={favorites}
+				currentCity={city}
+				onSelect={handleSelectCity}
+				onRemove={removeFavorite}
+				onReorder={reorderFavorites}
+				isFavorite={isFavorite(city)}
+				onAddFavorite={handleAddFavorite}
+				open={sidebarOpen}
+				onToggle={() => setSidebarOpen((v) => !v)}
+			/>
+
+			{/* 主内容区 */}
+			<div className='weather-card'>
+				<form onSubmit={handleSearch} className='search-form'>
+					<input
 						type='text'
 						placeholder='输入城市名称（如：北京）'
 						ref={inputRef}
@@ -145,20 +178,30 @@ function App() {
 							<span style={{ fontSize: '4rem', marginLeft: '20px' }}>{Math.round(data.currentTemp)}°</span>
 						</div>
 
-							<div className='daily-forecast'>
-								{data.daily.map((day) => (
-									<div key={day.date} className='day-item'>
-										<span>{format(new Date(day.date), 'EEE')}</span>
-										<div style={{ transform: 'scale(0.5)', margin: '-10px 0' }}>
-											<WeatherIcon code={day.weatherCode} size='small' />
-										</div>
-										<span className='day-desc'>{getWeatherLabel(day.weatherCode)}</span>
-										<span>
-											{Math.round(day.tempMin)}° / {Math.round(day.tempMax)}°
-										</span>
+						{/* 未来3天日预报 */}
+						<div className='daily-forecast'>
+							{data.daily.map((day) => (
+								<div key={day.date} className='day-item'>
+									<span>{format(new Date(day.date), 'EEE')}</span>
+									<div style={{ transform: 'scale(0.5)', margin: '-10px 0' }}>
+										<WeatherIcon code={day.weatherCode} size='small' />
 									</div>
-								))}
-							</div>
+									<span className='day-desc'>{getWeatherLabel(day.weatherCode)}</span>
+									<span>
+										{Math.round(day.tempMin)}° / {Math.round(day.tempMax)}°
+									</span>
+								</div>
+							))}
+						</div>
+
+						{/* 24小时逐小时预报 */}
+						<HourlyForecastView hourly={data.hourly} />
+
+						{/* 温度变化趋势SVG图表 */}
+						<TemperatureChart hourly={data.hourly} />
+
+						{/* 详细天气数据 */}
+						<WeatherDetailView detail={data.detail} />
 					</>
 				)}
 			</div>

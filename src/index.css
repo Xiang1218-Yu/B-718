@@ -254,7 +254,7 @@ html,
 	--card-shadow: rgba(18, 32, 72, 0.5);
 }
 
-/* Glassmorphism Card */
+/* Glassmorphism Card - 扩大宽度以容纳新组件 */
 .weather-card {
 	background: rgba(255, 255, 255, 0.2);
 	backdrop-filter: blur(10px);
@@ -263,11 +263,25 @@ html,
 	box-shadow: 0 8px 32px 0 var(--card-shadow);
 	border: 1px solid rgba(255, 255, 255, 0.18);
 	text-align: center;
-	max-width: 400px;
+	max-width: 720px;
 	width: 90%;
 	color: #fff;
 	position: relative;
 	z-index: 2;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+/* 自定义滚动条 */
+.weather-card::-webkit-scrollbar {
+	width: 4px;
+}
+.weather-card::-webkit-scrollbar-track {
+	background: transparent;
+}
+.weather-card::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.3);
+	border-radius: 2px;
 }
 
 .weather-desc {
@@ -480,5 +494,289 @@ button:hover {
 
 	.search-form button {
 		width: 100%;
+	}
+}
+
+/* ========== 侧边栏样式 ========== */
+.sidebar-toggle {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	z-index: 1001;
+	width: 42px;
+	height: 42px;
+	border-radius: 12px;
+	font-size: 1.2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 0;
+}
+
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: -300px;
+	width: 280px;
+	height: 100vh;
+	background: rgba(20, 25, 40, 0.92);
+	backdrop-filter: blur(16px);
+	border-right: 1px solid rgba(255, 255, 255, 0.1);
+	z-index: 1000;
+	transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+	padding: 70px 16px 20px;
+	display: flex;
+	flex-direction: column;
+}
+
+.sidebar-open {
+	left: 0;
+}
+
+.sidebar-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.sidebar-header h3 {
+	margin: 0;
+	color: rgba(255, 255, 255, 0.9);
+	font-size: 1.1rem;
+}
+
+.fav-add-btn {
+	font-size: 0.85rem;
+	padding: 6px 14px;
+	margin-left: 0;
+}
+
+.fav-added {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.sidebar-empty {
+	color: rgba(255, 255, 255, 0.45);
+	font-size: 0.85rem;
+	text-align: center;
+	margin-top: 40px;
+}
+
+.sidebar-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	flex: 1;
+	overflow-y: auto;
+}
+
+.sidebar-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border-radius: 10px;
+	cursor: default;
+	transition: background 0.2s;
+	margin-bottom: 4px;
+}
+
+.sidebar-item:hover {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-item-active {
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.sidebar-item-dragover {
+	border-top: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.sidebar-drag-handle {
+	cursor: grab;
+	font-size: 1rem;
+	color: rgba(255, 255, 255, 0.4);
+	user-select: none;
+}
+
+.sidebar-city-name {
+	flex: 1;
+	cursor: pointer;
+	color: rgba(255, 255, 255, 0.85);
+	font-size: 0.9rem;
+	text-align: left;
+}
+
+.sidebar-city-name:hover {
+	color: #fff;
+}
+
+.sidebar-remove-btn {
+	width: 26px;
+	height: 26px;
+	border-radius: 8px;
+	font-size: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	margin-left: 0;
+	background: rgba(255, 80, 80, 0.2);
+	color: rgba(255, 150, 150, 0.8);
+}
+
+.sidebar-remove-btn:hover {
+	background: rgba(255, 80, 80, 0.4);
+	color: #fff;
+}
+
+.sidebar-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.3);
+	z-index: 999;
+}
+
+/* ========== 区域标题 ========== */
+.section-title {
+	font-size: 0.95rem;
+	letter-spacing: 0.15em;
+	color: rgba(255, 255, 255, 0.7);
+	margin: 24px 0 12px;
+	text-align: left;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	padding-bottom: 6px;
+}
+
+/* ========== 小时级预报 ========== */
+.hourly-forecast-section {
+	margin-top: 8px;
+}
+
+.hourly-scroll {
+	display: flex;
+	gap: 8px;
+	overflow-x: auto;
+	padding-bottom: 8px;
+	scroll-snap-type: x mandatory;
+}
+
+.hourly-scroll::-webkit-scrollbar {
+	height: 3px;
+}
+
+.hourly-scroll::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.25);
+	border-radius: 2px;
+}
+
+.hourly-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 56px;
+	padding: 8px 4px;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.06);
+	scroll-snap-align: start;
+	gap: 4px;
+}
+
+.hourly-item-now {
+	background: rgba(255, 255, 255, 0.15);
+}
+
+.hourly-time {
+	font-size: 0.75rem;
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.hourly-icon {
+	transform: scale(0.4);
+	margin: -12px 0;
+}
+
+.hourly-desc {
+	font-size: 0.65rem;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.hourly-temp {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.9);
+}
+
+/* ========== 温度变化趋势图表 ========== */
+.temperature-chart-section {
+	margin-top: 8px;
+}
+
+.chart-container {
+	width: 100%;
+	padding: 4px 0;
+}
+
+.temp-chart-svg {
+	width: 100%;
+	height: auto;
+}
+
+/* ========== 详细天气数据 ========== */
+.weather-detail-section {
+	margin-top: 8px;
+}
+
+.detail-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+}
+
+.detail-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 10px 6px;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.06);
+	gap: 4px;
+}
+
+.detail-icon {
+	font-size: 1.2rem;
+}
+
+.detail-label {
+	font-size: 0.7rem;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.detail-value {
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.9);
+}
+
+/* ========== 响应式适配 ========== */
+@media (max-width: 520px) {
+	.detail-grid {
+		grid-template-columns: repeat(3, 1fr);
+		gap: 6px;
+	}
+
+	.detail-item {
+		padding: 8px 4px;
+	}
+
+	.weather-card {
+		padding: 24px 16px;
+	}
+
+	.sidebar {
+		width: 240px;
 	}
 }
